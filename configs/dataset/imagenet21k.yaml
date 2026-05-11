@@ -1,0 +1,4 @@
+#Winter21 ImageNet-21K-P variant 
+dataDir: "data/imagenet21k_resized"
+trainTars: "data/imagenet21k_resized/trainTars"
+valTars: "data/imagenet21k_resized/valTars"

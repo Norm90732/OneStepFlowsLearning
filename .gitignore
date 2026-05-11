@@ -1,0 +1,5 @@
+data/*
+scripts/*
+.conda/
+.cache/
+pyrefly.toml
