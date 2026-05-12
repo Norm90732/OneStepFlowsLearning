@@ -89,7 +89,6 @@ class MultiConditionEmbed(nn.Module):
     ) -> Float[torch.Tensor, "b sinusoidalDim"]:
         angle = torch.outer(inputTensor, self.freq)  # pyrefly:ignore
         embedding = torch.cat([torch.sin(angle), torch.cos(angle)], dim=-1)
-        print(embedding.shape)
         return embedding
 
     @jaxtyped(typechecker=beartype)
@@ -129,7 +128,7 @@ class MultiConditionEmbed(nn.Module):
         return hEmbedding, omegaEmbedding, cfgTStartEmbedding, cfgTEndEmbedding
 
 
-class SWIGLU(nn.Module):
+class SwiGlu(nn.Module):
     def __init__(self, embedDim: int, multiplier: int):
         super().__init__()
         self.upLinear = nn.Linear(embedDim, embedDim * multiplier * 2, bias=False)
