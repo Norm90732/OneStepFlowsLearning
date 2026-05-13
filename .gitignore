@@ -3,3 +3,39 @@ scripts/*
 .conda/
 .cache/
 pyrefly.toml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# Slurm and logs
+*.err
+*.out
+*.log
+slurm-*.out
+slurm-*.err
+nohup.out
+
+# Config
+pyrefly.toml
+
+# Weights and large files
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+
+# Wandb
+wandb/
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+*~
+scratch_tmp/
+core.store*

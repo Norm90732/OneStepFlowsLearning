@@ -1,0 +1,22 @@
+#transformer Size
+embedDim: 768
+numHeads: 12
+sinusoidalDim: 256
+sinusoidalBaseFreq: 10000
+ropeBaseFreq: 10000
+SwiGluMultiplier: 2
+sharedBackboneBlocks: 40
+numUBlocks: 8
+numVBlocks: 8 
+
+#tokenCreation
+classTokensNum: 8 
+timeTokensNum: 4
+omegaTokensNum: 4 
+tMinTokensNum: 2
+tMaxTokensNum: 2
+#imageEmbedding
+patchSize: 2
+imageSize: 32
+inputDim: 32
+numClasses: 1000

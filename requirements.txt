@@ -11,8 +11,8 @@ ninja
 cmake
 jvp-flash-attention==0.14.*
 
-transformer-engine[pytorch,core-cu13]>=2.14.1
-megatron-core
+#transformer-engine[pytorch,core-cu13]>=2.14.1
+#megatron-core
 
 
 torchmetrics
@@ -31,6 +31,6 @@ datasets
 webdataset
 huggingface_hub
 tqdm
-img2dataset
-lion-pytorch
+#img2dataset
+#lion-pytorch
 torch_ema
