@@ -1,4 +1,22 @@
 defaults:
-  - dataset: imagenet21k
+  - dataset: imagenet1k
   - models: imfDIT
   - _self_
+
+wandb:
+  project: OneStepFlows
+  entity: null
+  name: ${run.name}
+  group: null
+
+run:
+  name: mediumIMFRun
+  storagePath: ${hydra:runtime.cwd}/checkpoints
+
+checkpoint:
+  numToKeep: 5
+
+ray:
+  totalWorkers: 4
+  perWorkerCPU: 5
+  perWorkerGPU: 1

@@ -9,12 +9,11 @@ from pathlib import Path
 import json
 from dataset.imagenetUtils import getImagePaths
 from ray.data import DataContext, SaveMode
-
+import io 
 
 def makeWdsKey(path: str, classidx: int) -> str:
     p = Path(path)
     return f"{classidx:05d}_{p.parent.name}_{p.stem}"
-
 
 class VaeCompressor:
     def __init__(self):
@@ -77,20 +76,22 @@ class VaeCompressor:
             dim=0,
         )
 
+        
         latents = self.model(transformedImages)
+
         latents = latents.detach().to(torch.float16).cpu().numpy()
 
         keys = [
-            makeWdsKey(path, int(classidx)) for path, classidx in zip(paths, labels)
+            makeWdsKey(path, int(classidx))
+            for path, classidx in zip(paths, labels)
         ]
 
         return {
-            "__key__": np.asarray(keys, dtype=object),
-            "latent.npy": latents,
-            "classidx.cls": labels,
-            "imagepath.txt": np.asarray(paths, dtype=object),
+            "__key__": keys,
+            "latent.npy": latents,                
+            "classidx.cls": labels.astype(np.int64),
+            "imagepath.txt": [str(p) for p in paths],
         }
-
 
 if __name__ == "__main__":
     from omegaconf import OmegaConf
@@ -103,7 +104,7 @@ if __name__ == "__main__":
     resources = ray.available_resources()
     numGpus = resources.get("GPU", 0)
     cfg = OmegaConf.load("configs/config.yaml")
-    cfg.dataset = OmegaConf.load("configs/dataset/imagenet21k.yaml")
+    cfg.dataset = OmegaConf.load("configs/dataset/imagenet1k.yaml")
 
     allData = getImagePaths(cfg, "train")  # pyrefly:ignore
     print(f"{allData[100000]}")
@@ -112,12 +113,12 @@ if __name__ == "__main__":
     ds = ray.data.from_items(allData)
     latentDs = ds.map_batches(
         VaeCompressor,
-        batch_size=1536,
+        batch_size=1500,
         batch_format="numpy",
         num_gpus=1,
         compute=ray.data.ActorPoolStrategy(
             size=int(numGpus),
-            max_tasks_in_flight_per_actor=4,
+            max_tasks_in_flight_per_actor=3,
         ),
         udf_modifying_row_count=True,
     )
@@ -125,7 +126,6 @@ if __name__ == "__main__":
     trainPath = cfg.dataset.trainTars
     latentDs.write_webdataset(
         trainPath,
-        encoder=True,
         min_rows_per_file=30_000,
         mode=SaveMode.OVERWRITE,
     )

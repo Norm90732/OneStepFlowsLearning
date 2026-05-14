@@ -8,7 +8,6 @@ from models.embeddings import Conditioning2DRoPE
 from einops import rearrange
 
 
-# add gating mechanism in attention and swiglu paths
 class InContextBlock(nn.Module):
     def __init__(self, embedDim: int, numHeads: int, SwiGluMultiplier: int):
         super().__init__()
@@ -80,14 +79,16 @@ class InContextBlock(nn.Module):
             numHeads=self.numHeads,
             headDim=self.headDim,
         )
+        originalDtype = qJVP.dtype
+        with torch.autocast(device_type="cuda",enabled=False):
+            attention = JVPAttn.fwd_dual(
+                q=qJVP.float().contiguous(),
+                k=kJVP.float().contiguous(),
+                v=vJVP.float().contiguous(),
+                attn_mask=None,
+            )
 
-        attention = JVPAttn.fwd_dual(
-            q=qJVP.contiguous(),
-            k=kJVP.contiguous(),
-            v=vJVP.contiguous(),
-            attn_mask=None,
-        )
-
+        attention = attention.to(dtype=originalDtype)
         attentionReshape = rearrange(
             attention,
             "b numHeads seqlen headDim -> b seqlen (numHeads headDim)",

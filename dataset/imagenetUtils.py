@@ -56,7 +56,8 @@ if __name__ == "__main__":
     from omegaconf import OmegaConf
 
     cfg = OmegaConf.load("configs/config.yaml")
-    cfg.dataset = OmegaConf.load("configs/dataset/imagenet21k.yaml")
-    # createDirectoryToClassMapping(cfg)  #pyrefly:ignore
+    cfg.dataset = OmegaConf.load("configs/dataset/imagenet1k.yaml")
+    createDirectoryToClassMapping(cfg)  # pyrefly:ignore
+
     allData = getImagePaths(cfg, "train")
-    print(allData[1000000])
+    print(allData[10000])

@@ -8,7 +8,7 @@ from models.blocks import PatchEmbedding, UnPatchEmbedding, MultiConditionEmbed
 from omegaconf import DictConfig
 from einops import rearrange
 from beartype.typing import Tuple
-
+import math 
 
 class ImfDIT(nn.Module):
     def __init__(self, cfg: DictConfig):
@@ -52,6 +52,7 @@ class ImfDIT(nn.Module):
             imageSize=imageSize,
         )
 
+        # null at class 0, so need to add +1 to class labels
         self.embeddingTable = nn.Embedding(
             num_embeddings=numClasses, embedding_dim=self.embedDim
         )
@@ -148,10 +149,22 @@ class ImfDIT(nn.Module):
             imageSize=imageSize,
         )
 
+        self.apply(self._initLinearLayers)
+        
         nn.init.zeros_(self.unpatchUEmbedding.linearUnpatch.weight)
         nn.init.zeros_(self.unpatchUEmbedding.linearUnpatch.bias)
         nn.init.zeros_(self.unpatchVEmbedding.linearUnpatch.weight)
         nn.init.zeros_(self.unpatchVEmbedding.linearUnpatch.bias)
+        
+    @staticmethod
+    def _initLinearLayers(module: nn.Module):
+        if isinstance(module, nn.Linear):
+            fan = module.in_features
+            std = math.sqrt(0.1 / fan)  
+            nn.init.normal_(module.weight, mean=0.0, std=std)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        
 
     @jaxtyped(typechecker=beartype)
     def _buildSequence(
@@ -314,7 +327,6 @@ class ImfDIT(nn.Module):
         uLatent = self._finalLayerU(uImageTokens=uImageTokens)
         vLatent = self._finalLayerV(vImageTokens=vImageTokens)
 
-        # add to tokens
         return uLatent, vLatent
 
     @jaxtyped(typechecker=beartype)

@@ -1,0 +1,4 @@
+#imagenet1k
+dataDir: "data/imagenet1k/Data/CLS-LOC"
+trainTars: "data/imagenet1k/trainTars"
+valTars: "data/imagenet1k/valTars"

@@ -5,18 +5,50 @@ sinusoidalDim: 256
 sinusoidalBaseFreq: 10000
 ropeBaseFreq: 10000
 SwiGluMultiplier: 2
-sharedBackboneBlocks: 40
+sharedBackboneBlocks: 16
 numUBlocks: 8
 numVBlocks: 8 
 
-#tokenCreation
-classTokensNum: 8 
-timeTokensNum: 4
-omegaTokensNum: 4 
-tMinTokensNum: 2
-tMaxTokensNum: 2
+#tokenCreation (different than paper as it seq multiple of 32 total sequence for jvpFlashAttentionKernel)
+classTokensNum: 12
+timeTokensNum: 6
+omegaTokensNum: 6
+tMinTokensNum: 4
+tMaxTokensNum: 4
 #imageEmbedding
 patchSize: 2
 imageSize: 32
 inputDim: 32
 numClasses: 1000
+
+imFlow:
+  rMinusTDistribution:
+    mean: -0.4
+    std: 1
+    rTEqual: 0.5
+  omegaDistribution:
+    omegaMin: 1.0
+    omegaMax: 8.0
+    beta: 2
+  classDrop: 0.1
+  lossEps: 0.01
+  lossPower: 1 
+
+training:
+  optimizer:  #using adam 
+    lr: 1e-4
+    weightDecay: 0.0
+    betas: [0.9,0.95]
+
+  scheduler:
+    warmupEpochs: 10
+    trainingEpochs: 630 #trainingEpochs + warmup 
+
+  ema: 
+    emaDecay: 0.9999
+  
+  batchSize: 90
+  prefetchBatches: 4
+  
+  validate:
+    validateEvery: 5

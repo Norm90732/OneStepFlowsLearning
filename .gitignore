@@ -1,9 +1,11 @@
+.vscode
 data/*
 scripts/*
 .conda/
 .cache/
 pyrefly.toml
-
+outputs/
+checkpoints/
 # Python
 __pycache__/
 *.pyc
@@ -39,3 +41,5 @@ wandb/
 *~
 scratch_tmp/
 core.store*
+train.err
+train.log 
